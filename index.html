@@ -5,22 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DebateHub | Scroll. Vote. Debate.</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace']
+                    },
                     colors: {
                         dh: {
-                            black: '#0a0a0c',
-                            dark: '#13131a',
-                            card: '#1c1c26',
+                            black: '#050505',
+                            dark: '#0a0a0c',
+                            card: '#13131a',
                             purple: '#8b5cf6',
                             purpleHover: '#a855f7',
                             neon: '#c084fc',
+                            terminal: '#00ff41',
                             text: '#e2e8f0',
                             muted: '#94a3b8'
                         }
@@ -28,13 +32,14 @@
                     boxShadow: {
                         'neon': '0 0 15px rgba(139, 92, 246, 0.5)',
                         'neon-strong': '0 0 25px rgba(168, 85, 247, 0.8)',
+                        'terminal': '0 0 15px rgba(0, 255, 65, 0.3)',
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #0a0a0c; color: #e2e8f0; overflow: hidden; } /* Prevent whole page scroll, use container scroll */
+        body { background-color: #050505; color: #e2e8f0; overflow: hidden; } 
         
         /* Hide scrollbar for TikTok feel but keep functionality */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -50,35 +55,27 @@
 </head>
 <body class="font-sans antialiased h-screen flex flex-col selection:bg-dh-purple selection:text-white">
 
-    <!-- Navigation Bar -->
     <header class="z-50 bg-dh-dark/95 backdrop-blur-md border-b border-dh-purple/30 shadow-neon flex-shrink-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- Logo -->
             <div class="flex items-center gap-2 cursor-pointer" onclick="renderFeed()">
                 <i class="fa-solid fa-bolt text-dh-neon text-2xl"></i>
                 <span class="text-2xl font-bold tracking-wider text-white hidden sm:block">Debate<span class="text-dh-purple">Hub</span></span>
             </div>
 
-            <!-- Dynamic Search Bar -->
             <div class="flex flex-1 max-w-md mx-4 relative">
                 <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search characters or battles..." 
                     class="w-full bg-dh-card border border-gray-700 text-sm rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple text-dh-text placeholder-dh-muted transition-all">
                 <i class="fa-solid fa-search absolute left-4 top-2.5 text-dh-muted text-sm"></i>
             </div>
 
-            <!-- Auth / User Actions -->
             <div class="flex items-center gap-4" id="navActions">
-                <!-- Injected via JS -->
-            </div>
+                </div>
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="flex-grow max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 h-[calc(100vh-64px)]">
         
-        <!-- Left Sidebar: Hidden on mobile -->
         <aside class="lg:col-span-3 space-y-6 hidden lg:flex flex-col h-full overflow-y-auto custom-scroll pr-2">
-            <!-- Categories -->
             <div class="bg-dh-card rounded-xl p-5 border border-gray-800">
                 <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2">Categories</h3>
                 <ul class="space-y-2">
@@ -89,21 +86,25 @@
             </div>
             
             <div class="bg-dh-card rounded-xl p-5 border border-gray-800 flex-grow">
-                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-fire text-orange-500 mr-2"></i> Trending Fighters</h3>
+                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-tower-broadcast text-red-500 mr-2"></i> Live Streams</h3>
                 <div class="space-y-4 text-sm">
-                    <div class="flex items-center justify-between"><span class="text-white">1. Omni-Man</span><span class="text-dh-muted">92% Win</span></div>
-                    <div class="flex items-center justify-between"><span class="text-white">2. Gojo Satoru</span><span class="text-dh-muted">88% Win</span></div>
-                    <div class="flex items-center justify-between"><span class="text-white">3. Batman</span><span class="text-dh-muted">85% Win</span></div>
+                    <button onclick="toggleModal('liveModal')" class="w-full text-left bg-dh-dark p-3 rounded-lg border border-red-900/50 hover:border-red-500 transition-all flex items-center gap-3 group">
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=ComicNerd&background=random" class="w-8 h-8 rounded-full">
+                            <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-dh-dark animate-pulse"></div>
+                        </div>
+                        <div>
+                            <div class="text-white font-bold group-hover:text-red-400">ComicNerd</div>
+                            <div class="text-xs text-dh-muted font-mono">Debating Goku vs Superman</div>
+                        </div>
+                    </button>
                 </div>
             </div>
         </aside>
 
-        <!-- Center Column: TikTok Style Scroll Feed -->
         <section id="feedContainer" class="col-span-1 lg:col-span-6 h-full overflow-y-auto snap-y snap-mandatory no-scrollbar rounded-xl space-y-6 pb-20">
-            <!-- Feed items injected via JS -->
-        </section>
+            </section>
 
-        <!-- Right Sidebar -->
         <aside class="lg:col-span-3 space-y-6 hidden lg:flex flex-col h-full overflow-y-auto custom-scroll pl-2">
             <div class="bg-dh-card rounded-xl p-5 border border-gray-800 text-center">
                 <div class="w-16 h-16 bg-dh-dark rounded-full flex items-center justify-center mx-auto mb-3 border border-dh-purple shadow-neon">
@@ -115,7 +116,6 @@
         </aside>
     </main>
 
-    <!-- Auth Modal (Login & Signup) -->
     <div id="authModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('authModal')"></div>
         <div class="relative bg-dh-card border border-dh-purple/40 p-8 rounded-2xl shadow-neon-strong w-full max-w-md mx-4 animate-[fadeIn_0.2s_ease-out]">
@@ -123,7 +123,6 @@
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
             
-            <!-- Tabs -->
             <div class="flex border-b border-gray-700 mb-6">
                 <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 pb-3 font-bold text-dh-neon border-b-2 border-dh-neon transition-colors">Log In</button>
                 <button id="tabSignup" onclick="switchAuthTab('signup')" class="flex-1 pb-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors">Sign Up</button>
@@ -133,7 +132,7 @@
                 <input type="hidden" id="authMode" value="login">
                 <div id="usernameField" class="hidden">
                     <label class="block text-sm font-medium text-gray-300 mb-1">Username</label>
-                    <input type="text" id="regUsername" class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white focus:border-dh-purple focus:outline-none">
+                    <input type="text" id="regUsername" class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white font-mono focus:border-dh-purple focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
@@ -141,7 +140,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
-                    <input type="password" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white focus:border-dh-purple focus:outline-none">
+                    <input type="password" id="authPassword" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white focus:border-dh-purple focus:outline-none">
                 </div>
                 <button type="submit" id="authSubmitBtn" class="w-full bg-dh-purple hover:bg-dh-purpleHover text-white py-3 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(139,92,246,0.4)]">
                     Log In
@@ -150,7 +149,115 @@
         </div>
     </div>
 
-    <!-- Create Battle Modal -->
+    <div id="profileModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleModal('profileModal')"></div>
+        <div class="relative bg-dh-black border border-dh-terminal/40 p-0 rounded-lg shadow-terminal w-full max-w-2xl mx-4 overflow-hidden flex flex-col max-h-[85vh]">
+            
+            <div class="bg-gray-900 border-b border-dh-terminal/30 px-4 py-3 flex justify-between items-center">
+                <span class="font-mono text-dh-terminal text-sm"><i class="fa-solid fa-terminal mr-2"></i>sys.profile_settings</span>
+                <button onclick="toggleModal('profileModal')" class="text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="p-6 overflow-y-auto custom-scroll font-mono text-sm">
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="bg-dh-card border border-gray-800 p-4 rounded text-center">
+                        <div class="text-dh-muted mb-1">DEBATES</div>
+                        <div class="text-2xl text-white font-bold" id="statDebates">0</div>
+                    </div>
+                    <div class="bg-dh-card border border-gray-800 p-4 rounded text-center">
+                        <div class="text-dh-muted mb-1">VOTES CAST</div>
+                        <div class="text-2xl text-white font-bold" id="statVotes">0</div>
+                    </div>
+                    <div class="bg-dh-card border border-gray-800 p-4 rounded text-center">
+                        <div class="text-dh-terminal mb-1">RECENT VIEWERS</div>
+                        <div class="text-2xl text-white font-bold" id="statViewers">14</div>
+                        <div class="text-[10px] text-gray-500 mt-1">Last 48 hours</div>
+                    </div>
+                </div>
+
+                <form onsubmit="handleProfileUpdate(event)" class="space-y-6">
+                    <div class="space-y-4 border-l-2 border-dh-terminal pl-4">
+                        <h4 class="text-dh-terminal font-bold mb-4">> USER_DATA_MODIFICATION</h4>
+                        
+                        <div>
+                            <label class="block text-gray-400 mb-1">Display Name</label>
+                            <input type="text" id="profDisplayName" class="w-full bg-dh-dark border border-gray-700 rounded p-2 text-white focus:border-dh-terminal focus:outline-none">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 mb-1">Username (Requires Password)</label>
+                            <input type="text" id="profUsername" class="w-full bg-dh-dark border border-gray-700 rounded p-2 text-dh-terminal focus:border-dh-terminal focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-400 mb-1">Confirm Password to Save</label>
+                            <input type="password" id="profPassword" required class="w-full bg-dh-dark border border-gray-700 rounded p-2 text-white focus:border-red-500 focus:outline-none">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-dh-terminal/10 border border-dh-terminal text-dh-terminal hover:bg-dh-terminal hover:text-black py-3 rounded font-bold transition-all uppercase tracking-widest">
+                        Execute_Update()
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="dmPanel" class="fixed inset-y-0 left-0 w-full md:w-80 bg-dh-card border-r border-gray-800 shadow-2xl z-[90] transform -translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-dh-dark">
+            <h3 class="font-bold text-white"><i class="fa-solid fa-envelope text-dh-purple mr-2"></i> Private Debates</h3>
+            <button onclick="toggleDMs()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 custom-scroll space-y-1">
+            <div class="p-3 bg-dh-dark rounded-lg cursor-pointer hover:bg-gray-800 border border-transparent hover:border-gray-700 flex items-center gap-3">
+                <img src="https://ui-avatars.com/api/?name=JediMaster" class="w-10 h-10 rounded-full">
+                <div>
+                    <div class="text-white text-sm font-bold">JediMaster</div>
+                    <div class="text-xs text-dh-muted truncate">I still think Vader wins easily...</div>
+                </div>
+            </div>
+            <div class="p-4 text-center text-xs text-gray-500 italic mt-10 border-t border-gray-800">
+                (UI Prototype: Real-time DMs require a backend WebSocket server)
+            </div>
+        </div>
+    </div>
+
+    <div id="liveModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleModal('liveModal')"></div>
+        <div class="relative bg-dh-card border border-red-500 p-2 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.3)] w-full max-w-4xl mx-4 flex flex-col h-[80vh]">
+            <div class="flex justify-between items-center p-3">
+                <div class="flex items-center gap-3">
+                    <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded animate-pulse">LIVE</span>
+                    <span class="text-white font-bold">ComicNerd</span>
+                </div>
+                <button onclick="toggleModal('liveModal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="flex-1 bg-black rounded-lg flex items-center justify-center border border-gray-800 relative">
+                <i class="fa-solid fa-video text-gray-600 text-4xl mb-4"></i>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 font-mono text-sm">
+                    <p>Camera Feed Placeholder</p>
+                    <p class="text-xs mt-2 opacity-50">(Requires WebRTC / Backend Integration)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="commentsPanel" class="fixed inset-y-0 right-0 w-full md:w-96 bg-dh-card border-l border-gray-800 shadow-2xl z-[90] transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-dh-dark">
+            <h3 class="font-bold text-white"><i class="fa-solid fa-comments text-dh-purple mr-2"></i> Debate Thread</h3>
+            <button onclick="closeComments()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+        </div>
+        <div id="commentsList" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll">
+            </div>
+        <div class="p-4 bg-dh-dark border-t border-gray-800">
+            <form onsubmit="postComment(event)" class="flex gap-2">
+                <input type="hidden" id="activePostId">
+                <input type="text" id="commentInput" placeholder="Join the debate..." class="flex-1 bg-dh-card border border-gray-700 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-dh-purple" autocomplete="off">
+                <button type="submit" class="bg-dh-purple text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-dh-neon transition-colors"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
     <div id="createModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('createModal')"></div>
         <div class="relative bg-dh-card border border-dh-purple p-8 rounded-2xl shadow-neon-strong w-full max-w-lg mx-4">
@@ -178,91 +285,62 @@
         </div>
     </div>
 
-    <!-- Comments Slide-out Panel -->
-    <div id="commentsPanel" class="fixed inset-y-0 right-0 w-full md:w-96 bg-dh-card border-l border-gray-800 shadow-2xl z-[90] transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-dh-dark">
-            <h3 class="font-bold text-white"><i class="fa-solid fa-comments text-dh-purple mr-2"></i> Debate Thread</h3>
-            <button onclick="closeComments()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
-        </div>
-        
-        <!-- Comments List -->
-        <div id="commentsList" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll">
-            <!-- Rendered dynamically -->
-        </div>
-
-        <!-- Add Comment Input -->
-        <div class="p-4 bg-dh-dark border-t border-gray-800">
-            <form onsubmit="postComment(event)" class="flex gap-2">
-                <input type="hidden" id="activePostId">
-                <input type="text" id="commentInput" placeholder="Join the debate..." class="flex-1 bg-dh-card border border-gray-700 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-dh-purple" autocomplete="off">
-                <button type="submit" class="bg-dh-purple text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-dh-neon transition-colors"><i class="fa-solid fa-paper-plane"></i></button>
-            </form>
-        </div>
-    </div>
-
     <script>
-        // --- 1. STATE MANAGEMENT ---
+        // --- 1. STATE & STORAGE MANAGEMENT ---
         let currentUser = null; 
         
-        // Dummy Database of Battles
-        let battles = [
+        // Default Database 
+        const defaultBattles = [
             {
-                id: 1,
-                author: "SithLord99",
-                charA: "Darth Vader",
-                charB: "Voldemort",
+                id: 1, author: "SithLord99", charA: "Darth Vader", charB: "Voldemort",
                 context: "Standard gear. Location: Neutral wasteland. Both bloodlusted.",
-                votesA: 7240,
-                votesB: 2815,
-                likes: 12400,
-                likedByMe: false,
-                favByMe: false,
-                colorA: "from-blue-900 to-black",
-                colorB: "from-emerald-900 to-black",
+                votesA: 7240, votesB: 2815, likes: 12400, likedByMe: false, favByMe: false,
+                colorA: "from-blue-900 to-black", colorB: "from-emerald-900 to-black",
                 comments: [
                     { user: "JediMaster", text: "Vader Force chokes instantly. Next." },
                     { user: "PotterHead", text: "Apparition + Avada Kedavra. Voldy wins." }
                 ],
-                votedFor: null // 'A' or 'B'
+                votedFor: null
             },
             {
-                id: 2,
-                author: "WeebKing",
-                charA: "Goku",
-                charB: "Superman",
+                id: 2, author: "WeebKing", charA: "Goku", charB: "Superman",
                 context: "Tournament of Power rules. No killing.",
-                votesA: 45012,
-                votesB: 44980,
-                likes: 38200,
-                likedByMe: true,
-                favByMe: true,
-                colorA: "from-orange-700 to-black",
-                colorB: "from-blue-700 to-black",
-                comments: [
-                    { user: "ComicNerd", text: "Superman Prime One Million blinks the verse." }
-                ],
+                votesA: 45012, votesB: 44980, likes: 38200, likedByMe: true, favByMe: true,
+                colorA: "from-orange-700 to-black", colorB: "from-blue-700 to-black",
+                comments: [{ user: "ComicNerd", text: "Superman Prime One Million blinks the verse." }],
                 votedFor: null
             },
             {
-                id: 3,
-                author: "MarvelFan",
-                charA: "Wolverine",
-                charB: "Deadpool",
+                id: 3, author: "MarvelFan", charA: "Wolverine", charB: "Deadpool",
                 context: "Fight to incapacitation.",
-                votesA: 8900,
-                votesB: 9200,
-                likes: 4100,
-                likedByMe: false,
-                favByMe: false,
-                colorA: "from-yellow-700 to-black",
-                colorB: "from-red-900 to-black",
-                comments: [],
-                votedFor: null
+                votesA: 8900, votesB: 9200, likes: 4100, likedByMe: false, favByMe: false,
+                colorA: "from-yellow-700 to-black", colorB: "from-red-900 to-black",
+                comments: [], votedFor: null
             }
         ];
 
+        let battles = [];
+
+        // Load data from LocalStorage on boot
+        function initData() {
+            const savedUser = localStorage.getItem('dh_user');
+            if (savedUser) currentUser = JSON.parse(savedUser);
+
+            const savedBattles = localStorage.getItem('dh_battles');
+            battles = savedBattles ? JSON.parse(savedBattles) : defaultBattles;
+        }
+
+        // Save data to LocalStorage
+        function saveData() {
+            if (currentUser) localStorage.setItem('dh_user', JSON.stringify(currentUser));
+            else localStorage.removeItem('dh_user');
+            
+            localStorage.setItem('dh_battles', JSON.stringify(battles));
+        }
+
         // --- 2. INITIALIZATION & RENDERING ---
         document.addEventListener('DOMContentLoaded', () => {
+            initData();
             updateNav();
             renderFeed();
         });
@@ -271,10 +349,8 @@
             const feedContainer = document.getElementById('feedContainer');
             feedContainer.innerHTML = '';
 
-            // Sort by popularity (likes + votes)
             let displayBattles = [...battles].sort((a, b) => (b.likes + b.votesA + b.votesB) - (a.likes + a.votesA + a.votesB));
 
-            // Apply Search Filter
             if (filterText) {
                 const q = filterText.toLowerCase();
                 displayBattles = displayBattles.filter(b => 
@@ -288,7 +364,6 @@
                 return;
             }
 
-            // Build HTML for each battle
             displayBattles.forEach(battle => {
                 const totalVotes = battle.votesA + battle.votesB;
                 const pctA = totalVotes === 0 ? 50 : Math.round((battle.votesA / totalVotes) * 100);
@@ -302,21 +377,17 @@
 
                 const html = `
                 <article class="snap-start relative h-full min-h-[70vh] w-full rounded-2xl overflow-hidden flex flex-col bg-dh-card border border-gray-800 shadow-lg group">
-                    
-                    <!-- Header Data -->
                     <div class="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-700">
                         <img src="https://ui-avatars.com/api/?name=${battle.author}&background=random" class="w-6 h-6 rounded-full">
                         <span class="text-xs font-bold text-white">${battle.author}</span>
                     </div>
 
-                    <!-- Visual Split View -->
                     <div class="flex-1 flex w-full relative">
                         <div class="w-1/2 bg-gradient-to-br ${battle.colorA} flex flex-col items-center justify-center p-4 border-r border-dh-purple/30">
                             <h2 class="text-3xl md:text-5xl font-black italic text-white text-center drop-shadow-xl text-stroke">${battle.charA}</h2>
-                            <div class="text-xl font-bold text-white mt-4">${pctA}%</div>
+                            <div class="text-xl font-bold text-white mt-4 font-mono">${pctA}%</div>
                         </div>
                         
-                        <!-- VS Badge -->
                         <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                             <div class="bg-dh-dark border-2 border-dh-purple w-12 h-12 md:w-16 md:w-16 rounded-full flex items-center justify-center shadow-neon">
                                 <span class="text-lg md:text-xl font-black text-white italic">VS</span>
@@ -325,21 +396,18 @@
 
                         <div class="w-1/2 bg-gradient-to-bl ${battle.colorB} flex flex-col items-center justify-center p-4">
                             <h2 class="text-3xl md:text-5xl font-black italic text-white text-center drop-shadow-xl text-stroke">${battle.charB}</h2>
-                            <div class="text-xl font-bold text-white mt-4">${pctB}%</div>
+                            <div class="text-xl font-bold text-white mt-4 font-mono">${pctB}%</div>
                         </div>
                     </div>
 
-                    <!-- Interactive Bottom Bar -->
                     <div class="h-auto bg-dh-dark p-4 md:p-6 border-t border-gray-800">
                         <p class="text-center text-xs text-dh-muted mb-4">${battle.context || 'Standard Rules Apply'}</p>
                         
-                        <!-- Progress Bar -->
                         <div class="w-full bg-gray-800 rounded-full h-2 mb-4 flex overflow-hidden">
                             <div class="bg-blue-500 h-2 transition-all duration-500" style="width: ${pctA}%"></div>
                             <div class="bg-red-500 h-2 transition-all duration-500" style="width: ${pctB}%"></div>
                         </div>
 
-                        <!-- Vote Buttons -->
                         <div class="flex gap-4 max-w-2xl mx-auto pr-16 md:pr-0">
                             <button onclick="castVote(${battle.id}, 'A')" class="flex-1 border py-2 md:py-3 rounded-xl font-bold transition-all ${btnAClass}">
                                 Vote ${battle.charA.split(' ')[0]}
@@ -350,7 +418,6 @@
                         </div>
                     </div>
 
-                    <!-- TikTok Style Action Bar (Floating Right) -->
                     <div class="absolute right-2 md:right-4 bottom-32 md:bottom-24 flex flex-col items-center space-y-6 z-30">
                         <button onclick="toggleLike(${battle.id})" class="flex flex-col items-center group">
                             <div class="w-10 h-10 md:w-12 md:h-12 bg-black/60 backdrop-blur rounded-full flex items-center justify-center border border-gray-700 group-hover:border-dh-purple transition-all">
@@ -370,32 +437,27 @@
                             </div>
                         </button>
                     </div>
-
                 </article>
                 `;
                 feedContainer.insertAdjacentHTML('beforeend', html);
             });
         }
 
-        // --- 3. CORE LOGIC (VOTING, LIKES, SEARCH) ---
+        // --- 3. CORE LOGIC & SYNC ---
         function castVote(id, choice) {
             if (!currentUser) return toggleModal('authModal');
             
             const battle = battles.find(b => b.id === id);
-            if (battle.votedFor) {
-                alert("You have already voted on this matchup!");
-                return;
-            }
+            if (battle.votedFor) return alert("You have already voted on this matchup!");
 
             battle.votedFor = choice;
             if (choice === 'A') battle.votesA++;
             if (choice === 'B') battle.votesB++;
             
-            // Re-render feed keeping current scroll position
-            const container = document.getElementById('feedContainer');
-            const scrollPos = container.scrollTop;
-            renderFeed(document.getElementById('searchInput').value);
-            container.scrollTop = scrollPos;
+            currentUser.votesCast = (currentUser.votesCast || 0) + 1; // Activity tracking
+            
+            saveData(); // Sync to localStorage
+            refreshFeedScroll();
         }
 
         function toggleLike(id) {
@@ -404,32 +466,32 @@
             battle.likedByMe = !battle.likedByMe;
             battle.likedByMe ? battle.likes++ : battle.likes--;
             
-            const container = document.getElementById('feedContainer');
-            const scrollPos = container.scrollTop;
-            renderFeed(document.getElementById('searchInput').value);
-            container.scrollTop = scrollPos;
+            saveData();
+            refreshFeedScroll();
         }
 
         function toggleFav(id) {
             if (!currentUser) return toggleModal('authModal');
             const battle = battles.find(b => b.id === id);
             battle.favByMe = !battle.favByMe;
-            
+            saveData();
+            refreshFeedScroll();
+        }
+
+        function refreshFeedScroll() {
             const container = document.getElementById('feedContainer');
             const scrollPos = container.scrollTop;
             renderFeed(document.getElementById('searchInput').value);
             container.scrollTop = scrollPos;
         }
 
-        function handleSearch(val) {
-            renderFeed(val);
-        }
+        function handleSearch(val) { renderFeed(val); }
+        function formatNumber(num) { return num > 999 ? (num/1000).toFixed(1) + 'k' : num; }
 
         // --- 4. COMMENTS SYSTEM ---
         function openComments(id) {
             document.getElementById('activePostId').value = id;
-            const panel = document.getElementById('commentsPanel');
-            panel.classList.remove('translate-x-full');
+            document.getElementById('commentsPanel').classList.remove('translate-x-full');
             renderCommentsList(id);
         }
 
@@ -442,7 +504,7 @@
             const list = document.getElementById('commentsList');
             
             if (battle.comments.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm mt-4">No arguments yet. Be the first!</p>`;
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm mt-4 font-mono">No arguments yet. Be the first!</p>`;
                 return;
             }
 
@@ -457,7 +519,6 @@
                     </div>
                 </div>
             `).join('');
-            
             list.scrollTop = list.scrollHeight;
         }
 
@@ -471,26 +532,25 @@
             const id = parseInt(document.getElementById('activePostId').value);
             const input = document.getElementById('commentInput');
             const text = input.value.trim();
-            
             if (!text) return;
 
             const battle = battles.find(b => b.id === id);
-            battle.comments.push({ user: currentUser, text: text });
+            battle.comments.push({ user: currentUser.displayName, text: text });
             
+            saveData();
             input.value = '';
             renderCommentsList(id);
-
-            // Re-render feed silently to update comment count badge
-            const container = document.getElementById('feedContainer');
-            const scrollPos = container.scrollTop;
-            renderFeed(document.getElementById('searchInput').value);
-            container.scrollTop = scrollPos;
+            refreshFeedScroll();
         }
 
-        // --- 5. AUTH & USER FLOW ---
+        // --- 5. AUTH, PROFILE, & DMs ---
         function toggleModal(modalID) {
-            const modal = document.getElementById(modalID);
-            modal.classList.toggle('hidden');
+            document.getElementById(modalID).classList.toggle('hidden');
+        }
+
+        function toggleDMs() {
+            if(!currentUser) return toggleModal('authModal');
+            document.getElementById('dmPanel').classList.toggle('-translate-x-full');
         }
 
         function switchAuthTab(mode) {
@@ -516,23 +576,34 @@
         function handleAuth(e) {
             e.preventDefault();
             const mode = document.getElementById('authMode').value;
+            const password = document.getElementById('authPassword').value;
             
+            let uname = "";
             if (mode === 'signup') {
-                const user = document.getElementById('regUsername').value;
-                if(!user) return alert("Enter a username");
-                currentUser = user;
+                uname = document.getElementById('regUsername').value;
+                if(!uname) return alert("Enter a username");
             } else {
-                // Fake Login
                 const email = document.getElementById('authEmail').value;
-                currentUser = email.split('@')[0]; // dummy username
+                uname = email.split('@')[0];
             }
 
+            // Create robust user object
+            currentUser = {
+                username: uname,
+                displayName: uname,
+                password: password, // Note: Storing plaintext password in localstorage is insecure for prod! Just for this demo functionality.
+                votesCast: 0,
+                debatesCreated: 0
+            };
+
+            saveData();
             toggleModal('authModal');
             updateNav();
         }
 
         function logout() {
             currentUser = null;
+            saveData();
             updateNav();
         }
 
@@ -540,12 +611,16 @@
             const nav = document.getElementById('navActions');
             if (currentUser) {
                 nav.innerHTML = `
+                    <button onclick="toggleDMs()" class="text-gray-400 hover:text-dh-neon transition-colors mr-2 relative">
+                        <i class="fa-solid fa-paper-plane text-xl"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">1</span>
+                    </button>
                     <button onclick="toggleModal('createModal')" class="bg-dh-purple hover:bg-dh-purpleHover text-white px-4 py-1.5 rounded-full font-bold text-sm shadow-neon transition-all mr-2">
                         + Create
                     </button>
-                    <div class="flex items-center gap-2 group relative cursor-pointer" onclick="logout()">
-                        <img src="https://ui-avatars.com/api/?name=${currentUser}&background=8b5cf6&color=fff" class="w-8 h-8 rounded-full border border-dh-purple">
-                        <span class="text-sm font-bold text-white hidden md:block hover:text-red-400" title="Click to logout">${currentUser}</span>
+                    <div class="flex items-center gap-2 group relative cursor-pointer" onclick="openProfile()">
+                        <img src="https://ui-avatars.com/api/?name=${currentUser.displayName}&background=8b5cf6&color=fff" class="w-8 h-8 rounded-full border border-dh-purple">
+                        <span class="text-sm font-bold text-white hidden md:block group-hover:text-dh-terminal font-mono transition-colors">${currentUser.displayName}</span>
                     </div>
                 `;
             } else {
@@ -555,6 +630,37 @@
                     </button>
                 `;
             }
+        }
+
+        function openProfile() {
+            document.getElementById('profDisplayName').value = currentUser.displayName;
+            document.getElementById('profUsername').value = currentUser.username;
+            document.getElementById('profPassword').value = '';
+            
+            document.getElementById('statVotes').innerText = currentUser.votesCast || 0;
+            document.getElementById('statDebates').innerText = currentUser.debatesCreated || 0;
+            
+            toggleModal('profileModal');
+        }
+
+        function handleProfileUpdate(e) {
+            e.preventDefault();
+            const pass = document.getElementById('profPassword').value;
+            const newDisplay = document.getElementById('profDisplayName').value;
+            const newUsername = document.getElementById('profUsername').value;
+
+            if (newUsername !== currentUser.username) {
+                if (pass !== currentUser.password) {
+                    alert("ACCESS DENIED: Incorrect password for username modification.");
+                    return;
+                }
+            }
+
+            currentUser.displayName = newDisplay;
+            currentUser.username = newUsername;
+            saveData();
+            updateNav();
+            toggleModal('profileModal');
         }
 
         // --- 6. CREATE BATTLE FLOW ---
@@ -568,32 +674,24 @@
             
             const newBattle = {
                 id: newId,
-                author: currentUser,
-                charA: f1,
-                charB: f2,
-                context: ctx,
+                author: currentUser.displayName,
+                charA: f1, charB: f2, context: ctx,
                 votesA: 0, votesB: 0, likes: 0,
                 likedByMe: false, favByMe: false,
-                colorA: "from-purple-900 to-black", // Default generic colors
+                colorA: "from-purple-900 to-black", 
                 colorB: "from-gray-800 to-black",
-                comments: [],
-                votedFor: null
+                comments: [], votedFor: null
             };
 
             battles.push(newBattle);
+            currentUser.debatesCreated = (currentUser.debatesCreated || 0) + 1;
             
+            saveData();
             toggleModal('createModal');
-            e.target.reset();
-            
-            // Clear search and jump to top of feed to see new post
-            document.getElementById('searchInput').value = '';
+            document.getElementById('fighter1').value = '';
+            document.getElementById('fighter2').value = '';
+            document.getElementById('battleContext').value = '';
             renderFeed();
-            document.getElementById('feedContainer').scrollTop = 0;
-        }
-
-        // Utils
-        function formatNumber(num) {
-            return num >= 1000 ? (num/1000).toFixed(1) + 'k' : num;
         }
     </script>
 </body>
