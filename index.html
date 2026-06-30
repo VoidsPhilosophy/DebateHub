@@ -1,148 +1,433 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DebateHub | Character Face-Offs</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com"></script>
+    <title>DebateHub | Fictional Character Battles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
                     colors: {
-                        brand: {
-                            black: '#09090b',
-                            dark: '#121214',
-                            gray: '#1e1e24',
-                            purple: '#7c3aed',
-                            neon: '#a78bfa',
-                            accent: '#ec4899'
+                        dh: {
+                            black: '#0a0a0c',
+                            dark: '#13131a',
+                            card: '#1c1c26',
+                            purple: '#8b5cf6',
+                            purpleHover: '#a855f7',
+                            neon: '#c084fc',
+                            text: '#e2e8f0',
+                            muted: '#94a3b8'
                         }
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(139, 92, 246, 0.5)',
+                        'neon-strong': '0 0 25px rgba(168, 85, 247, 0.8)',
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #09090b; color: #f4f4f5; font-family: system-ui, -apple-system, sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #121214; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 3px; }
+        body { background-color: #0a0a0c; color: #e2e8f0; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #13131a; }
+        ::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
+        .clip-slant { clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); }
     </style>
 </head>
-<body class="min-h-screen flex flex-col custom-scrollbar">
+<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-dh-purple selection:text-white">
 
-    <!-- NAVIGATION BAR -->
-    <nav class="sticky top-0 z-50 bg-brand-dark/90 backdrop-blur-md border-b border-brand-purple/20 px-4 py-3">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-dh-dark/90 backdrop-blur-md border-b border-dh-purple/30 shadow-neon">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Logo -->
-            <a href="#" onclick="navigate('home')" class="flex items-center gap-2 font-black text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-brand-neon to-brand-accent">
-                <i data-lucide="swords" class="text-brand-purple stroke-[2.5]"></i>DEBATE<span class="text-white">HUB</span>
-            </a>
+            <div class="flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-bolt text-dh-neon text-2xl"></i>
+                <span class="text-2xl font-bold tracking-wider text-white">Debate<span class="text-dh-purple">Hub</span></span>
+            </div>
 
             <!-- Search Bar -->
-            <div class="hidden md:flex items-center flex-1 max-w-md relative">
-                <i data-lucide="search" class="absolute left-3 text-zinc-400 w-4 h-4"></i>
-                <input type="text" placeholder="Search characters or battles..." class="w-full bg-brand-black border border-zinc-800 rounded-full pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:border-brand-purple transition">
+            <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                <input type="text" placeholder="Search characters, battles, or users..." 
+                    class="w-full bg-dh-card border border-gray-700 text-sm rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple text-dh-text placeholder-dh-muted transition-all">
+                <i class="fa-solid fa-search absolute left-4 top-2.5 text-dh-muted text-sm"></i>
             </div>
 
-            <!-- Nav Links -->
-            <div class="flex items-center gap-4 text-sm font-medium">
-                <button onclick="navigate('rankings')" class="hover:text-brand-neon transition flex items-center gap-1"><i data-lucide="trophy" class="w-4 h-4"></i>Rankings</button>
-                <button onclick="openLogin()" id="loginBtn" class="bg-brand-purple hover:bg-brand-purple/80 text-white px-4 py-1.5 rounded-full transition flex items-center gap-1"><i data-lucide="log-in" class="w-4 h-4"></i>Login</button>
-                <div id="userProfile" class="hidden items-center gap-2 text-brand-neon">
-                    <i data-lucide="user" class="w-4 h-4"></i><span id="usernameDisplay">User</span>
-                </div>
+            <!-- Actions -->
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-dh-muted hover:text-white"><i class="fa-solid fa-search"></i></button>
+                <button onclick="toggleModal('loginModal')" class="bg-transparent border border-dh-purple text-dh-neon hover:bg-dh-purple hover:text-white px-5 py-1.5 rounded-full font-semibold transition-all shadow-[0_0_10px_rgba(139,92,246,0.2)] hover:shadow-neon">
+                    Log In
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <!-- HOME PAGE -->
-        <section id="page-home" class="page-view space-y-10">
-            <!-- Hero Banner -->
-            <div class="relative bg-gradient-to-r from-brand-dark to-brand-black border border-brand-purple/30 rounded-2xl p-8 text-center overflow-hidden shadow-2xl shadow-brand-purple/10">
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-purple/20 blur-3xl rounded-full"></div>
-                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-3">Who Wins? <span class="text-brand-neon">You Decide.</span></h1>
-                <p class="text-zinc-400 max-w-xl mx-auto text-sm md:text-base">Vote, analyze, and debate your favorite fictional cross-universe match-ups with thousands of fans.</p>
+        <!-- Left Sidebar: Categories & Rankings -->
+        <aside class="lg:col-span-3 space-y-8 hidden lg:block">
+            <!-- Categories -->
+            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 shadow-lg">
+                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-layer-group text-dh-purple mr-2"></i> Categories</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-mask"></i> Comics</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">1.2k</span></a></li>
+                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-dragon"></i> Anime/Manga</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">3.4k</span></a></li>
+                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-gamepad"></i> Video Games</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">850</span></a></li>
+                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-film"></i> Movies/TV</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">2.1k</span></a></li>
+                </ul>
             </div>
 
-            <!-- Categories Grid -->
-            <div>
-                <h2 class="text-lg font-bold uppercase tracking-wider text-zinc-400 mb-4 flex items-center gap-2"><i data-lucide="layout-grid" class="w-5 h-5 text-brand-purple"></i>Pop Culture Categories</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="bg-brand-dark border border-zinc-800 hover:border-brand-purple p-4 rounded-xl text-center cursor-pointer transition group">
-                        <i data-lucide="zap" class="w-8 h-8 mx-auto mb-2 text-yellow-500 group-hover:scale-110 transition"></i>
-                        <span class="font-bold text-sm block">Anime / Manga</span>
+            <!-- Rankings Leaderboard -->
+            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 shadow-lg">
+                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i> Top Ranked</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-yellow-500 text-lg w-4">1</span>
+                        <img src="https://ui-avatars.com/api/?name=Superman&background=0D8ABC&color=fff" alt="Superman" class="w-10 h-10 rounded-full border-2 border-yellow-500">
+                        <div>
+                            <p class="font-semibold text-sm text-white">Superman</p>
+                            <p class="text-xs text-dh-muted">Win Rate: 89%</p>
+                        </div>
                     </div>
-                    <div class="bg-brand-dark border border-zinc-800 hover:border-brand-purple p-4 rounded-xl text-center cursor-pointer transition group">
-                        <i data-lucide="shield" class="w-8 h-8 mx-auto mb-2 text-blue-500 group-hover:scale-110 transition"></i>
-                        <span class="font-bold text-sm block">Comic Books</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-gray-400 text-lg w-4">2</span>
+                        <img src="https://ui-avatars.com/api/?name=Goku&background=F59E0B&color=fff" alt="Goku" class="w-10 h-10 rounded-full border-2 border-gray-400">
+                        <div>
+                            <p class="font-semibold text-sm text-white">Goku</p>
+                            <p class="text-xs text-dh-muted">Win Rate: 87%</p>
+                        </div>
                     </div>
-                    <div class="bg-brand-dark border border-zinc-800 hover:border-brand-purple p-4 rounded-xl text-center cursor-pointer transition group">
-                        <i data-lucide="gamepad-2" class="w-8 h-8 mx-auto mb-2 text-green-500 group-hover:scale-110 transition"></i>
-                        <span class="font-bold text-sm block">Video Games</span>
-                    </div>
-                    <div class="bg-brand-dark border border-zinc-800 hover:border-brand-purple p-4 rounded-xl text-center cursor-pointer transition group">
-                        <i data-lucide="clapperboard" class="w-8 h-8 mx-auto mb-2 text-brand-accent class group-hover:scale-110 transition"></i>
-                        <span class="font-bold text-sm block">Sci-Fi / Movies</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-amber-700 text-lg w-4">3</span>
+                        <img src="https://ui-avatars.com/api/?name=Batman&background=111&color=fff" alt="Batman" class="w-10 h-10 rounded-full border-2 border-amber-700">
+                        <div>
+                            <p class="font-semibold text-sm text-white">Batman (Prep)</p>
+                            <p class="text-xs text-dh-muted">Win Rate: 82%</p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </aside>
 
-            <!-- Active VS Battles -->
-            <div>
-                <h2 class="text-lg font-bold uppercase tracking-wider text-zinc-400 mb-4 flex items-center gap-2"><i data-lucide="flame" class="w-5 h-5 text-brand-purple"></i>Trending Battles</h2>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <!-- Battle Card 1 -->
-                    <div onclick="navigate('battle')" class="bg-brand-dark border border-zinc-800 hover:border-brand-purple/50 rounded-xl p-5 cursor-pointer transition flex flex-col justify-between relative group">
-                        <div class="flex justify-between items-center mb-4 text-xs font-semibold text-brand-neon bg-brand-purple/10 px-3 py-1 rounded-full w-fit">Active Arena</div>
-                        <div class="grid grid-cols-3 items-center text-center gap-2">
-                            <div>
-                                <div class="w-16 h-16 bg-zinc-800 rounded-full mx-auto mb-2 border-2 border-blue-500 overflow-hidden flex items-center justify-center font-bold text-xl">S</div>
-                                <span class="font-bold text-sm block group-hover:text-brand-neon transition">Goku</span>
+        <!-- Center Column: VS Battle Page -->
+        <section class="col-span-1 lg:col-span-6 space-y-6">
+            
+            <!-- Featured Battle Card -->
+            <article class="bg-dh-card rounded-2xl overflow-hidden border border-gray-800 shadow-lg">
+                <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-dh-dark">
+                    <span class="text-xs font-bold uppercase tracking-wider text-dh-neon bg-dh-purple/20 px-2 py-1 rounded">Featured Match</span>
+                    <span class="text-sm text-dh-muted"><i class="fa-regular fa-clock"></i> Ends in 24h</span>
+                </div>
+                
+                <!-- Battle Images & VS -->
+                <div class="relative flex h-64 bg-black">
+                    <!-- Character A -->
+                    <div class="w-1/2 relative bg-gradient-to-r from-blue-900 to-black flex items-end justify-start p-4 border-r-2 border-dh-purple/50">
+                        <!-- Placeholder for character image -->
+                        <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1533613220915-609f661a6fe1?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
+                        <h2 class="relative z-10 text-3xl font-black italic text-white drop-shadow-lg">Darth Vader</h2>
+                    </div>
+                    
+                    <!-- VS Badge -->
+                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                        <div class="bg-dh-dark border-4 border-dh-purple w-16 h-16 rounded-full flex items-center justify-center shadow-neon-strong">
+                            <span class="text-xl font-black text-white italic">VS</span>
+                        </div>
+                    </div>
+
+                    <!-- Character B -->
+                    <div class="w-1/2 relative bg-gradient-to-l from-emerald-900 to-black flex items-end justify-end p-4">
+                         <!-- Placeholder for character image -->
+                         <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
+                        <h2 class="relative z-10 text-3xl font-black italic text-white drop-shadow-lg">Voldemort</h2>
+                    </div>
+                </div>
+
+                <!-- Voting Section -->
+                <div class="p-6">
+                    <p class="text-center text-dh-muted mb-6 text-sm">Rules: Standard gear. Location: Neutral wasteland. Both bloodlusted.</p>
+                    
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-blue-400" id="votesA_text">7,240 Votes (72%)</span>
+                        <span class="font-bold text-emerald-400" id="votesB_text">2,815 Votes (28%)</span>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-800 rounded-full h-4 mb-6 flex overflow-hidden">
+                        <div id="barA" class="bg-blue-600 h-4 transition-all duration-500" style="width: 72%"></div>
+                        <div id="barB" class="bg-emerald-600 h-4 transition-all duration-500" style="width: 28%"></div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button onclick="castVote('A')" class="flex-1 bg-blue-600/20 hover:bg-blue-600 border border-blue-600 text-white py-3 rounded-xl font-bold transition-all hover:shadow-[0_0_15px_rgba(37,99,235,0.6)]">
+                            Vote Vader
+                        </button>
+                        <button onclick="castVote('B')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-600 text-white py-3 rounded-xl font-bold transition-all hover:shadow-[0_0_15px_rgba(5,150,105,0.6)]">
+                            Vote Voldemort
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Comments Section -->
+            <div class="bg-dh-card rounded-2xl p-6 border border-gray-800">
+                <h3 class="text-xl font-bold text-white mb-6 border-b border-gray-700 pb-2">Debate Forum (1.2k Comments)</h3>
+                
+                <!-- Add Comment -->
+                <div class="flex gap-4 mb-8">
+                    <img src="https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff" class="w-10 h-10 rounded-full" alt="Your Avatar">
+                    <div class="flex-1">
+                        <textarea id="commentBox" rows="3" class="w-full bg-dh-dark border border-gray-700 rounded-xl p-3 text-white placeholder-dh-muted focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple resize-none" placeholder="State your argument..."></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button onclick="postComment()" class="bg-dh-purple hover:bg-dh-purpleHover text-white px-6 py-2 rounded-lg font-semibold transition-all">Post Argument</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Comments -->
+                <div class="space-y-6" id="commentsList">
+                    <!-- Comment 1 -->
+                    <div class="flex gap-4">
+                        <img src="https://ui-avatars.com/api/?name=SithLord99&background=random" class="w-10 h-10 rounded-full mt-1">
+                        <div>
+                            <div class="bg-dh-dark p-4 rounded-xl rounded-tl-none border border-gray-800">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-white text-sm">SithLord99</span>
+                                    <span class="text-xs text-dh-muted">2 hours ago</span>
+                                </div>
+                                <p class="text-sm text-gray-300">Vader takes this easily. The Force doesn't require a wand, and a Force choke is instantaneous. Voldemort wouldn't even have time to utter a syllable of Avada Kedavra.</p>
                             </div>
-                            <div class="font-black text-zinc-600 group-hover:text-brand-accent transition text-xl italic">VS</div>
-                            <div>
-                                <div class="w-16 h-16 bg-zinc-800 rounded-full mx-auto mb-2 border-2 border-red-500 overflow-hidden flex items-center justify-center font-bold text-xl">K</div>
-                                <span class="font-bold text-sm block group-hover:text-brand-neon transition">Superman</span>
+                            <div class="flex gap-4 mt-2 ml-2 text-xs text-dh-muted font-semibold">
+                                <button class="hover:text-dh-neon transition"><i class="fa-solid fa-arrow-up"></i> 452</button>
+                                <button class="hover:text-red-500 transition"><i class="fa-solid fa-arrow-down"></i> 12</button>
+                                <button class="hover:text-white transition">Reply</button>
                             </div>
                         </div>
-                        <div class="mt-4 pt-4 border-t border-zinc-800 flex justify-between text-xs text-zinc-500">
-                            <span><i data-lucide="message-square" class="w-3.5 h-3.5 inline mr-1"></i>142 Comments</span>
-                            <span><i data-lucide="thumbs-up" class="w-3.5 h-3.5 inline mr-1"></i>3.2k Votes</span>
+                    </div>
+
+                    <!-- Comment 2 -->
+                    <div class="flex gap-4">
+                        <img src="https://ui-avatars.com/api/?name=PotterFan&background=random" class="w-10 h-10 rounded-full mt-1">
+                        <div>
+                            <div class="bg-dh-dark p-4 rounded-xl rounded-tl-none border border-gray-800">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold text-white text-sm">PotterFan_Always</span>
+                                    <span class="text-xs text-dh-muted">3 hours ago</span>
+                                </div>
+                                <p class="text-sm text-gray-300">People underestimate Apparition. Voldemort can teleport instantly, cast Fiendfyre, or use non-verbal spells. Vader's armor is tough, but it can't block an Unforgivable Curse.</p>
+                            </div>
+                            <div class="flex gap-4 mt-2 ml-2 text-xs text-dh-muted font-semibold">
+                                <button class="hover:text-dh-neon transition"><i class="fa-solid fa-arrow-up"></i> 215</button>
+                                <button class="hover:text-red-500 transition"><i class="fa-solid fa-arrow-down"></i> 89</button>
+                                <button class="hover:text-white transition">Reply</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- RANKINGS PAGE -->
-        <section id="page-rankings" class="page-view hidden space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">CHARACTER POWER RANKINGS</h2>
-                <span class="text-xs bg-zinc-800 px-3 py-1 rounded-full text-zinc-400">Community Voted</span>
+        <!-- Right Sidebar: Character Profiles -->
+        <aside class="lg:col-span-3 space-y-6 hidden lg:block">
+            
+            <div class="bg-dh-card rounded-xl border border-gray-800 overflow-hidden shadow-lg">
+                <div class="bg-dh-purple/10 border-b border-dh-purple/30 p-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chart-line text-dh-neon"></i> Trending Profile</h3>
+                </div>
+                
+                <div class="p-5 flex flex-col items-center relative">
+                    <!-- Decorative background glow -->
+                    <div class="absolute top-10 w-20 h-20 bg-dh-purple rounded-full blur-2xl opacity-20"></div>
+                    
+                    <img src="https://ui-avatars.com/api/?name=Omni-Man&background=E53E3E&color=fff&size=128" class="w-24 h-24 rounded-full border-4 border-dh-dark shadow-neon mb-4 relative z-10" alt="Omni-Man">
+                    <h4 class="text-xl font-bold text-white">Omni-Man</h4>
+                    <p class="text-sm text-dh-muted mb-4">Invincible Universe</p>
+                    
+                    <div class="w-full space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-400">Strength</span>
+                                <span class="text-white">Planetary</span>
+                            </div>
+                            <div class="w-full bg-dh-dark rounded-full h-1.5"><div class="bg-red-500 h-1.5 rounded-full" style="width: 90%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-400">Speed</span>
+                                <span class="text-white">FTL</span>
+                            </div>
+                            <div class="w-full bg-dh-dark rounded-full h-1.5"><div class="bg-blue-400 h-1.5 rounded-full" style="width: 85%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-400">Durability</span>
+                                <span class="text-white">Extreme</span>
+                            </div>
+                            <div class="w-full bg-dh-dark rounded-full h-1.5"><div class="bg-green-400 h-1.5 rounded-full" style="width: 88%"></div></div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-6 bg-dh-dark hover:bg-gray-800 border border-gray-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors">
+                        View Full Profile
+                    </button>
+                </div>
             </div>
-            <div class="bg-brand-dark border border-zinc-800 rounded-xl overflow-hidden">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-zinc-950 text-zinc-400 uppercase text-xs tracking-wider border-b border-zinc-800">
-                        <tr>
-                            <th class="p-4 w-16 text-center">Rank</th>
-                            <th class="p-4">Character</th>
-                            <th class="p-4">Universe</th>
-                            <th class="p-4 text-right">Win Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-900">
-                        <tr onclick="navigate('profile')" class="hover:bg-brand-purple/5 cursor-pointer transition">
-                            <td class="p-4 font-bold text-center text-yellow-500">#1</td>
-                            <td class="p-4 font-bold text-brand-neon">Goku</td>
-                            <td class="p-4 text-zinc-400">Dragon Ball</td>
-                            <td class="p-4 text-right font-semibold text-green-400">89.4%</td>
-                        </tr>
+
+            <!-- Recent Battles -->
+            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 shadow-lg">
+                <h3 class="text-md font-bold mb-4 text-white border-b border-gray-700 pb-2">Completed Battles</h3>
+                <div class="space-y-4">
+                    <a href="#" class="block group">
+                        <div class="flex justify-between text-sm text-white mb-1">
+                            <span>Thor</span> <span class="text-dh-muted text-xs">vs</span> <span>Wonder Woman</span>
+                        </div>
+                        <div class="w-full flex h-2 rounded-full overflow-hidden">
+                            <div class="bg-dh-purple group-hover:bg-dh-neon transition-colors" style="width: 60%"></div>
+                            <div class="bg-gray-600" style="width: 40%"></div>
+                        </div>
+                        <p class="text-right text-[10px] text-dh-muted mt-1">Thor Wins (60%)</p>
+                    </a>
+                    <a href="#" class="block group">
+                        <div class="flex justify-between text-sm text-white mb-1">
+                            <span>Naruto</span> <span class="text-dh-muted text-xs">vs</span> <span>Luffy</span>
+                        </div>
+                        <div class="w-full flex h-2 rounded-full overflow-hidden">
+                            <div class="bg-dh-purple group-hover:bg-dh-neon transition-colors" style="width: 53%"></div>
+                            <div class="bg-gray-600" style="width: 47%"></div>
+                        </div>
+                        <p class="text-right text-[10px] text-dh-muted mt-1">Naruto Wins (53%)</p>
+                    </a>
+                </div>
+            </div>
+
+        </aside>
+    </main>
+
+    <!-- Login/Signup Modal (Hidden by default) -->
+    <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="toggleModal('loginModal')"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-dh-card border border-dh-purple/40 p-8 rounded-2xl shadow-neon-strong w-full max-w-md mx-4 animate-[fadeIn_0.2s_ease-out]">
+            <button onclick="toggleModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <i class="fa-solid fa-bolt text-dh-neon text-3xl mb-2"></i>
+                <h2 class="text-2xl font-bold text-white">Join the Debate</h2>
+                <p class="text-sm text-dh-muted mt-1">Sign in to vote and defend your favorites.</p>
+            </div>
+
+            <form class="space-y-5" onsubmit="event.preventDefault(); toggleModal('loginModal'); alert('Login successful!');">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Email or Username</label>
+                    <input type="text" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                    <input type="password" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple">
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center text-gray-400 gap-2 cursor-pointer">
+                        <input type="checkbox" class="rounded text-dh-purple focus:ring-dh-purple bg-dh-dark border-gray-700"> Remember me
+                    </label>
+                    <a href="#" class="text-dh-neon hover:underline">Forgot password?</a>
+                </div>
+                <button type="submit" class="w-full bg-dh-purple hover:bg-dh-purpleHover text-white py-3 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+                    Log In
+                </button>
+            </form>
+            <p class="text-center text-sm text-gray-400 mt-6">
+                Don't have an account? <a href="#" class="text-dh-neon font-bold hover:underline">Sign up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Interactivity Scripts -->
+    <script>
+        // --- Modal Logic ---
+        function toggleModal(modalID) {
+            const modal = document.getElementById(modalID);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // --- Voting Logic ---
+        let votesA = 7240;
+        let votesB = 2815;
+        let hasVoted = false;
+
+        function castVote(choice) {
+            if (hasVoted) {
+                alert("You have already voted in this match!");
+                return;
+            }
+            
+            if (choice === 'A') votesA++;
+            if (choice === 'B') votesB++;
+            
+            hasVoted = true;
+            updateVoteUI();
+        }
+
+        function updateVoteUI() {
+            const total = votesA + votesB;
+            const pctA = Math.round((votesA / total) * 100);
+            const pctB = 100 - pctA;
+
+            // Animate Bars
+            document.getElementById('barA').style.width = pctA + '%';
+            document.getElementById('barB').style.width = pctB + '%';
+
+            // Update Text
+            document.getElementById('votesA_text').innerText = `${votesA.toLocaleString()} Votes (${pctA}%)`;
+            document.getElementById('votesB_text').innerText = `${votesB.toLocaleString()} Votes (${pctB}%)`;
+        }
+
+        // --- Comment Logic ---
+        function postComment() {
+            const box = document.getElementById('commentBox');
+            const text = box.value.trim();
+            if(!text) return;
+
+            const list = document.getElementById('commentsList');
+            const newComment = `
+                <div class="flex gap-4 animate-[fadeIn_0.5s_ease-out]">
+                    <img src="https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff" class="w-10 h-10 rounded-full mt-1">
+                    <div class="w-full">
+                        <div class="bg-dh-dark p-4 rounded-xl rounded-tl-none border border-dh-purple/50 shadow-[0_0_10px_rgba(139,92,246,0.1)]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-dh-neon text-sm">You</span>
+                                <span class="text-xs text-dh-muted">Just now</span>
+                            </div>
+                            <p class="text-sm text-gray-300">${text}</p>
+                        </div>
+                        <div class="flex gap-4 mt-2 ml-2 text-xs text-dh-muted font-semibold">
+                            <button class="hover:text-dh-neon transition"><i class="fa-solid fa-arrow-up"></i> 0</button>
+                            <button class="hover:text-red-500 transition"><i class="fa-solid fa-arrow-down"></i> 0</button>
+                            <button class="hover:text-white transition">Reply</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            list.insertAdjacentHTML('afterbegin', newComment);
+            box.value = '';
+        }
+    </script>
+</body>
+</html>
