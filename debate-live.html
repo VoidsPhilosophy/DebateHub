@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Debate | DebateHub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Specific CSS for the VS Screen */
+        .vs-container { display: flex; justify-content: space-between; align-items: center; margin: 40px 0; gap: 20px; }
+        .character-card { flex: 1; text-align: center; padding: 40px; }
+        .vs-badge { font-size: 2rem; font-family: var(--font-display); color: var(--crimson-main); text-shadow: var(--glow-intense); }
+        .vote-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; display: flex; overflow: hidden; }
+        .vote-left { width: 65%; background: var(--crimson-main); box-shadow: var(--glow-subtle); }
+        .vote-right { width: 35%; background: var(--purple-magic); }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <nav class="nav-bar">
+            <a href="index.html" class="brand">DebateHub</a>
+        </nav>
+    </header>
 
+    <main class="container mt-2">
+        <div class="vs-container">
+            <div class="glass-panel character-card">
+                <h2>Cosmic Sorceress</h2>
+                <p class="text-muted">Reality Warping, Chaos Magic</p>
+                <button class="btn-primary mt-2">Vote Left</button>
+            </div>
+            
+            <div class="vs-badge">VS</div>
+            
+            <div class="glass-panel character-card">
+                <h2>The Kryptonian</h2>
+                <p class="text-muted">Solar Energy Absorption, Invulnerability</p>
+                <button class="btn-primary mt-2" style="background: var(--purple-magic);">Vote Right</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h3>Community Verdict: Sorceress Favored (65%)</h3>
+            <div class="vote-bar">
+                <div class="vote-left"></div>
+                <div class="vote-right"></div>
+            </div>
+        </div>
+
+        <section class="glass-panel">
+            <h3 class="mb-2">Opening Statements</h3>
+            <div style="border-left: 2px solid var(--crimson-main); padding-left: 15px; margin-bottom: 20px;">
+                <h4>@ArcaneScholar <span style="font-size: 0.8rem; color: var(--text-muted);">Lv. 42 Tier: Sage</span></h4>
+                <p class="mt-2">In a bloodlusted scenario, the Sorceress possesses reality-warping capabilities that bypass traditional durability. While the Kryptonian boasts immense physical stats and speed, Chaos Magic has consistently shown the ability to alter atomic structures...</p>
+            </div>
+            <hr style="border-color: var(--glass-border); margin: 20px 0;">
+            <textarea class="glass-panel" style="width: 100%; color: white; resize: vertical; min-height: 100px;" placeholder="Add your rebuttal... (Markdown supported)"></textarea>
+            <button class="btn-primary mt-2">Post Reply</button>
+        </section>
+    </main>
+
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
