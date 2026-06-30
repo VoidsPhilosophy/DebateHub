@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DebateHub | Fictional Character Battles</title>
+    <title>DebateHub | Scroll. Vote. Debate.</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
         tailwind.config = {
@@ -34,399 +34,566 @@
         }
     </script>
     <style>
-        body { background-color: #0a0a0c; color: #e2e8f0; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #13131a; }
-        ::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
-        .clip-slant { clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); }
+        body { background-color: #0a0a0c; color: #e2e8f0; overflow: hidden; } /* Prevent whole page scroll, use container scroll */
+        
+        /* Hide scrollbar for TikTok feel but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Standard Scrollbar for sidebars */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        .text-stroke { -webkit-text-stroke: 1px rgba(255,255,255,0.2); }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex flex-col selection:bg-dh-purple selection:text-white">
+<body class="font-sans antialiased h-screen flex flex-col selection:bg-dh-purple selection:text-white">
 
     <!-- Navigation Bar -->
-    <header class="sticky top-0 z-50 bg-dh-dark/90 backdrop-blur-md border-b border-dh-purple/30 shadow-neon">
+    <header class="z-50 bg-dh-dark/95 backdrop-blur-md border-b border-dh-purple/30 shadow-neon flex-shrink-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Logo -->
-            <div class="flex items-center gap-2 cursor-pointer">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="renderFeed()">
                 <i class="fa-solid fa-bolt text-dh-neon text-2xl"></i>
-                <span class="text-2xl font-bold tracking-wider text-white">Debate<span class="text-dh-purple">Hub</span></span>
+                <span class="text-2xl font-bold tracking-wider text-white hidden sm:block">Debate<span class="text-dh-purple">Hub</span></span>
             </div>
 
-            <!-- Search Bar -->
-            <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
-                <input type="text" placeholder="Search characters, battles, or users..." 
+            <!-- Dynamic Search Bar -->
+            <div class="flex flex-1 max-w-md mx-4 relative">
+                <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search characters or battles..." 
                     class="w-full bg-dh-card border border-gray-700 text-sm rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple text-dh-text placeholder-dh-muted transition-all">
                 <i class="fa-solid fa-search absolute left-4 top-2.5 text-dh-muted text-sm"></i>
             </div>
 
-            <!-- Actions -->
-            <div class="flex items-center gap-4">
-                <button class="md:hidden text-dh-muted hover:text-white"><i class="fa-solid fa-search"></i></button>
-                <button onclick="toggleModal('loginModal')" class="bg-transparent border border-dh-purple text-dh-neon hover:bg-dh-purple hover:text-white px-5 py-1.5 rounded-full font-semibold transition-all shadow-[0_0_10px_rgba(139,92,246,0.2)] hover:shadow-neon">
-                    Log In
-                </button>
+            <!-- Auth / User Actions -->
+            <div class="flex items-center gap-4" id="navActions">
+                <!-- Injected via JS -->
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 h-[calc(100vh-64px)]">
         
-        <!-- Left Sidebar: Categories & Rankings -->
-        <aside class="lg:col-span-3 space-y-8 hidden lg:block">
+        <!-- Left Sidebar: Hidden on mobile -->
+        <aside class="lg:col-span-3 space-y-6 hidden lg:flex flex-col h-full overflow-y-auto custom-scroll pr-2">
             <!-- Categories -->
-            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 shadow-lg">
-                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-layer-group text-dh-purple mr-2"></i> Categories</h3>
+            <div class="bg-dh-card rounded-xl p-5 border border-gray-800">
+                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2">Categories</h3>
                 <ul class="space-y-2">
-                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-mask"></i> Comics</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">1.2k</span></a></li>
-                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-dragon"></i> Anime/Manga</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">3.4k</span></a></li>
-                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-gamepad"></i> Video Games</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">850</span></a></li>
-                    <li><a href="#" class="flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-film"></i> Movies/TV</span> <span class="text-xs bg-dh-dark px-2 py-1 rounded">2.1k</span></a></li>
+                    <li><button class="w-full flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-mask"></i> Comics</span></button></li>
+                    <li><button class="w-full flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-dragon"></i> Anime</span></button></li>
+                    <li><button class="w-full flex items-center justify-between text-dh-muted hover:text-dh-neon hover:bg-dh-dark px-3 py-2 rounded-lg transition-colors"><span class="flex items-center gap-2"><i class="fa-solid fa-film"></i> Sci-Fi</span></button></li>
                 </ul>
             </div>
-
-            <!-- Rankings Leaderboard -->
-            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 shadow-lg">
-                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-trophy text-yellow-500 mr-2"></i> Top Ranked</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-yellow-500 text-lg w-4">1</span>
-                        <img src="https://ui-avatars.com/api/?name=Superman&background=0D8ABC&color=fff" alt="Superman" class="w-10 h-10 rounded-full border-2 border-yellow-500">
-                        <div>
-                            <p class="font-semibold text-sm text-white">Superman</p>
-                            <p class="text-xs text-dh-muted">Win Rate: 89%</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-gray-400 text-lg w-4">2</span>
-                        <img src="https://ui-avatars.com/api/?name=Goku&background=F59E0B&color=fff" alt="Goku" class="w-10 h-10 rounded-full border-2 border-gray-400">
-                        <div>
-                            <p class="font-semibold text-sm text-white">Goku</p>
-                            <p class="text-xs text-dh-muted">Win Rate: 87%</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-amber-700 text-lg w-4">3</span>
-                        <img src="https://ui-avatars.com/api/?name=Batman&background=111&color=fff" alt="Batman" class="w-10 h-10 rounded-full border-2 border-amber-700">
-                        <div>
-                            <p class="font-semibold text-sm text-white">Batman (Prep)</p>
-                            <p class="text-xs text-dh-muted">Win Rate: 82%</p>
-                        </div>
-                    </div>
+            
+            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 flex-grow">
+                <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2"><i class="fa-solid fa-fire text-orange-500 mr-2"></i> Trending Fighters</h3>
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-center justify-between"><span class="text-white">1. Omni-Man</span><span class="text-dh-muted">92% Win</span></div>
+                    <div class="flex items-center justify-between"><span class="text-white">2. Gojo Satoru</span><span class="text-dh-muted">88% Win</span></div>
+                    <div class="flex items-center justify-between"><span class="text-white">3. Batman</span><span class="text-dh-muted">85% Win</span></div>
                 </div>
             </div>
         </aside>
 
-        <!-- Center Column: VS Battle Page -->
-        <section class="col-span-1 lg:col-span-6 space-y-6">
-            
-            <!-- Featured Battle Card -->
-            <article class="bg-dh-card rounded-2xl overflow-hidden border border-gray-800 shadow-lg">
-                <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-dh-dark">
-                    <span class="text-xs font-bold uppercase tracking-wider text-dh-neon bg-dh-purple/20 px-2 py-1 rounded">Featured Match</span>
-                    <span class="text-sm text-dh-muted"><i class="fa-regular fa-clock"></i> Ends in 24h</span>
-                </div>
-                
-                <!-- Battle Images & VS -->
-                <div class="relative flex h-64 bg-black">
-                    <!-- Character A -->
-                    <div class="w-1/2 relative bg-gradient-to-r from-blue-900 to-black flex items-end justify-start p-4 border-r-2 border-dh-purple/50">
-                        <!-- Placeholder for character image -->
-                        <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1533613220915-609f661a6fe1?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
-                        <h2 class="relative z-10 text-3xl font-black italic text-white drop-shadow-lg">Darth Vader</h2>
-                    </div>
-                    
-                    <!-- VS Badge -->
-                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                        <div class="bg-dh-dark border-4 border-dh-purple w-16 h-16 rounded-full flex items-center justify-center shadow-neon-strong">
-                            <span class="text-xl font-black text-white italic">VS</span>
-                        </div>
-                    </div>
-
-                    <!-- Character B -->
-                    <div class="w-1/2 relative bg-gradient-to-l from-emerald-900 to-black flex items-end justify-end p-4">
-                         <!-- Placeholder for character image -->
-                         <div class="absolute inset-0 opacity-40 bg-[url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
-                        <h2 class="relative z-10 text-3xl font-black italic text-white drop-shadow-lg">Voldemort</h2>
-                    </div>
-                </div>
-
-                <!-- Voting Section -->
-                <div class="p-6">
-                    <p class="text-center text-dh-muted mb-6 text-sm">Rules: Standard gear. Location: Neutral wasteland. Both bloodlusted.</p>
-                    
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-blue-400" id="votesA_text">7,240 Votes (72%)</span>
-                        <span class="font-bold text-emerald-400" id="votesB_text">2,815 Votes (28%)</span>
-                    </div>
-                    
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-gray-800 rounded-full h-4 mb-6 flex overflow-hidden">
-                        <div id="barA" class="bg-blue-600 h-4 transition-all duration-500" style="width: 72%"></div>
-                        <div id="barB" class="bg-emerald-600 h-4 transition-all duration-500" style="width: 28%"></div>
-                    </div>
-
-                    <div class="flex gap-4">
-                        <button onclick="castVote('A')" class="flex-1 bg-blue-600/20 hover:bg-blue-600 border border-blue-600 text-white py-3 rounded-xl font-bold transition-all hover:shadow-[0_0_15px_rgba(37,99,235,0.6)]">
-                            Vote Vader
-                        </button>
-                        <button onclick="castVote('B')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-600 text-white py-3 rounded-xl font-bold transition-all hover:shadow-[0_0_15px_rgba(5,150,105,0.6)]">
-                            Vote Voldemort
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Comments Section -->
-            <div class="bg-dh-card rounded-2xl p-6 border border-gray-800">
-                <h3 class="text-xl font-bold text-white mb-6 border-b border-gray-700 pb-2">Debate Forum (1.2k Comments)</h3>
-                
-                <!-- Add Comment -->
-                <div class="flex gap-4 mb-8">
-                    <img src="https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff" class="w-10 h-10 rounded-full" alt="Your Avatar">
-                    <div class="flex-1">
-                        <textarea id="commentBox" rows="3" class="w-full bg-dh-dark border border-gray-700 rounded-xl p-3 text-white placeholder-dh-muted focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple resize-none" placeholder="State your argument..."></textarea>
-                        <div class="flex justify-end mt-2">
-                            <button onclick="postComment()" class="bg-dh-purple hover:bg-dh-purpleHover text-white px-6 py-2 rounded-lg font-semibold transition-all">Post Argument</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Existing Comments -->
-                <div class="space-y-6" id="commentsList">
-                    <!-- Comment 1 -->
-                    <div class="flex gap-4">
-                        <img src="https://ui-avatars.com/api/?name=SithLord99&background=random" class="w-10 h-10 rounded-full mt-1">
-                        <div>
-                            <div class="bg-dh-dark p-4 rounded-xl rounded-tl-none border border-gray-800">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="font-bold text-white text-sm">SithLord99</span>
-                                    <span class="text-xs text-dh-muted">2 hours ago</span>
-                                </div>
-                                <p class="text-sm text-gray-300">Vader takes this easily. The Force doesn't require a wand, and a Force choke is instantaneous. Voldemort wouldn't even have time to utter a syllable of Avada Kedavra.</p>
-                            </div>
-                            <div class="flex gap-4 mt-2 ml-2 text-xs text-dh-muted font-semibold">
-                                <button class="hover:text-dh-neon transition"><i class="fa-solid fa-arrow-up"></i> 452</button>
-                                <button class="hover:text-red-500 transition"><i class="fa-solid fa-arrow-down"></i> 12</button>
-                                <button class="hover:text-white transition">Reply</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comment 2 -->
-                    <div class="flex gap-4">
-                        <img src="https://ui-avatars.com/api/?name=PotterFan&background=random" class="w-10 h-10 rounded-full mt-1">
-                        <div>
-                            <div class="bg-dh-dark p-4 rounded-xl rounded-tl-none border border-gray-800">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="font-bold text-white text-sm">PotterFan_Always</span>
-                                    <span class="text-xs text-dh-muted">3 hours ago</span>
-                                </div>
-                                <p class="text-sm text-gray-300">People underestimate Apparition. Voldemort can teleport instantly, cast Fiendfyre, or use non-verbal spells. Vader's armor is tough, but it can't block an Unforgivable Curse.</p>
-                            </div>
-                            <div class="flex gap-4 mt-2 ml-2 text-xs text-dh-muted font-semibold">
-                                <button class="hover:text-dh-neon transition"><i class="fa-solid fa-arrow-up"></i> 215</button>
-                                <button class="hover:text-red-500 transition"><i class="fa-solid fa-arrow-down"></i> 89</button>
-                                <button class="hover:text-white transition">Reply</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Center Column: TikTok Style Scroll Feed -->
+        <section id="feedContainer" class="col-span-1 lg:col-span-6 h-full overflow-y-auto snap-y snap-mandatory no-scrollbar rounded-xl space-y-6 pb-20">
+            <!-- Feed items injected via JS -->
         </section>
 
-        <!-- Right Sidebar: Character Profiles -->
-        <aside class="lg:col-span-3 space-y-6 hidden lg:block">
-            
-            <div class="bg-dh-card rounded-xl border border-gray-800 overflow-hidden shadow-lg">
-                <div class="bg-dh-purple/10 border-b border-dh-purple/30 p-4">
-                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chart-line text-dh-neon"></i> Trending Profile</h3>
+        <!-- Right Sidebar -->
+        <aside class="lg:col-span-3 space-y-6 hidden lg:flex flex-col h-full overflow-y-auto custom-scroll pl-2">
+            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 text-center">
+                <div class="w-16 h-16 bg-dh-dark rounded-full flex items-center justify-center mx-auto mb-3 border border-dh-purple shadow-neon">
+                    <i class="fa-solid fa-trophy text-2xl text-yellow-500"></i>
                 </div>
-                
-                <div class="p-5 flex flex-col items-center relative">
-                    <!-- Decorative background glow -->
-                    <div class="absolute top-10 w-20 h-20 bg-dh-purple rounded-full blur-2xl opacity-20"></div>
-                    
-                    <img src="https://ui-avatars.com/api/?name=Omni-Man&background=E53E3E&color=fff&size=128" class="w-24 h-24 rounded-full border-4 border-dh-dark shadow-neon mb-4 relative z-10" alt="Omni-Man">
-                    <h4 class="text-xl font-bold text-white">Omni-Man</h4>
-                    <p class="text-sm text-dh-muted mb-4">Invincible Universe</p>
-                    
-                    <div class="w-full space-y-3">
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-400">Strength</span>
-                                <span class="text-white">Planetary</span>
-                            </div>
-                            <div class="w-full bg-dh-dark rounded-full h-1.5"><div class="bg-red-500 h-1.5 rounded-full" style="width: 90%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-400">Speed</span>
-                                <span class="text-white">FTL</span>
-                            </div>
-                            <div class="w-full bg-dh-dark rounded-full h-1.5"><div class="bg-blue-400 h-1.5 rounded-full" style="width: 85%"></div></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-400">Durability</span>
-                                <span class="text-white">Extreme</span>
-                            </div>
-                            <div class="w-full bg-dh-dark rounded-full h-1.5"><div class="bg-green-400 h-1.5 rounded-full" style="width: 88%"></div></div>
-                        </div>
-                    </div>
-                    
-                    <button class="w-full mt-6 bg-dh-dark hover:bg-gray-800 border border-gray-700 text-white py-2 rounded-lg text-sm font-semibold transition-colors">
-                        View Full Profile
-                    </button>
-                </div>
+                <h3 class="font-bold text-white mb-2">Welcome to the Arena</h3>
+                <p class="text-sm text-dh-muted mb-4">Scroll down to view popular debates. Create an account to vote, argue, and create your own matchups.</p>
             </div>
-
-            <!-- Recent Battles -->
-            <div class="bg-dh-card rounded-xl p-5 border border-gray-800 shadow-lg">
-                <h3 class="text-md font-bold mb-4 text-white border-b border-gray-700 pb-2">Completed Battles</h3>
-                <div class="space-y-4">
-                    <a href="#" class="block group">
-                        <div class="flex justify-between text-sm text-white mb-1">
-                            <span>Thor</span> <span class="text-dh-muted text-xs">vs</span> <span>Wonder Woman</span>
-                        </div>
-                        <div class="w-full flex h-2 rounded-full overflow-hidden">
-                            <div class="bg-dh-purple group-hover:bg-dh-neon transition-colors" style="width: 60%"></div>
-                            <div class="bg-gray-600" style="width: 40%"></div>
-                        </div>
-                        <p class="text-right text-[10px] text-dh-muted mt-1">Thor Wins (60%)</p>
-                    </a>
-                    <a href="#" class="block group">
-                        <div class="flex justify-between text-sm text-white mb-1">
-                            <span>Naruto</span> <span class="text-dh-muted text-xs">vs</span> <span>Luffy</span>
-                        </div>
-                        <div class="w-full flex h-2 rounded-full overflow-hidden">
-                            <div class="bg-dh-purple group-hover:bg-dh-neon transition-colors" style="width: 53%"></div>
-                            <div class="bg-gray-600" style="width: 47%"></div>
-                        </div>
-                        <p class="text-right text-[10px] text-dh-muted mt-1">Naruto Wins (53%)</p>
-                    </a>
-                </div>
-            </div>
-
         </aside>
     </main>
 
-    <!-- Login/Signup Modal (Hidden by default) -->
-    <div id="loginModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="toggleModal('loginModal')"></div>
-        
-        <!-- Modal Content -->
+    <!-- Auth Modal (Login & Signup) -->
+    <div id="authModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('authModal')"></div>
         <div class="relative bg-dh-card border border-dh-purple/40 p-8 rounded-2xl shadow-neon-strong w-full max-w-md mx-4 animate-[fadeIn_0.2s_ease-out]">
-            <button onclick="toggleModal('loginModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+            <button onclick="toggleModal('authModal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
             
-            <div class="text-center mb-8">
-                <i class="fa-solid fa-bolt text-dh-neon text-3xl mb-2"></i>
-                <h2 class="text-2xl font-bold text-white">Join the Debate</h2>
-                <p class="text-sm text-dh-muted mt-1">Sign in to vote and defend your favorites.</p>
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-700 mb-6">
+                <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 pb-3 font-bold text-dh-neon border-b-2 border-dh-neon transition-colors">Log In</button>
+                <button id="tabSignup" onclick="switchAuthTab('signup')" class="flex-1 pb-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors">Sign Up</button>
             </div>
 
-            <form class="space-y-5" onsubmit="event.preventDefault(); toggleModal('loginModal'); alert('Login successful!');">
+            <form id="authForm" class="space-y-5" onsubmit="handleAuth(event)">
+                <input type="hidden" id="authMode" value="login">
+                <div id="usernameField" class="hidden">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Username</label>
+                    <input type="text" id="regUsername" class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white focus:border-dh-purple focus:outline-none">
+                </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Email or Username</label>
-                    <input type="text" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple">
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                    <input type="email" id="authEmail" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white focus:border-dh-purple focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
-                    <input type="password" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-dh-purple focus:ring-1 focus:ring-dh-purple">
+                    <input type="password" required class="w-full bg-dh-dark border border-gray-700 rounded-xl px-4 py-2 text-white focus:border-dh-purple focus:outline-none">
                 </div>
-                <div class="flex items-center justify-between text-sm">
-                    <label class="flex items-center text-gray-400 gap-2 cursor-pointer">
-                        <input type="checkbox" class="rounded text-dh-purple focus:ring-dh-purple bg-dh-dark border-gray-700"> Remember me
-                    </label>
-                    <a href="#" class="text-dh-neon hover:underline">Forgot password?</a>
-                </div>
-                <button type="submit" class="w-full bg-dh-purple hover:bg-dh-purpleHover text-white py-3 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+                <button type="submit" id="authSubmitBtn" class="w-full bg-dh-purple hover:bg-dh-purpleHover text-white py-3 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(139,92,246,0.4)]">
                     Log In
                 </button>
             </form>
-            <p class="text-center text-sm text-gray-400 mt-6">
-                Don't have an account? <a href="#" class="text-dh-neon font-bold hover:underline">Sign up</a>
-            </p>
         </div>
     </div>
 
-    <!-- Interactivity Scripts -->
+    <!-- Create Battle Modal -->
+    <div id="createModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleModal('createModal')"></div>
+        <div class="relative bg-dh-card border border-dh-purple p-8 rounded-2xl shadow-neon-strong w-full max-w-lg mx-4">
+            <h2 class="text-2xl font-bold text-white mb-6">Create a Matchup</h2>
+            <form onsubmit="handleCreateBattle(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-1">Fighter 1</label>
+                        <input type="text" id="fighter1" required placeholder="e.g. Iron Man" class="w-full bg-dh-dark border border-gray-700 rounded-lg p-2 text-white focus:border-dh-purple outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-1">Fighter 2</label>
+                        <input type="text" id="fighter2" required placeholder="e.g. Batman" class="w-full bg-dh-dark border border-gray-700 rounded-lg p-2 text-white focus:border-dh-purple outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1">Context / Rules (Optional)</label>
+                    <input type="text" id="battleContext" placeholder="e.g. 1 month prep time in NYC" class="w-full bg-dh-dark border border-gray-700 rounded-lg p-2 text-white focus:border-dh-purple outline-none">
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="toggleModal('createModal')" class="flex-1 bg-gray-800 text-white py-2 rounded-lg font-bold hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="flex-1 bg-dh-purple text-white py-2 rounded-lg font-bold hover:bg-dh-purpleHover shadow-neon">Post Battle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comments Slide-out Panel -->
+    <div id="commentsPanel" class="fixed inset-y-0 right-0 w-full md:w-96 bg-dh-card border-l border-gray-800 shadow-2xl z-[90] transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-gray-800 flex justify-between items-center bg-dh-dark">
+            <h3 class="font-bold text-white"><i class="fa-solid fa-comments text-dh-purple mr-2"></i> Debate Thread</h3>
+            <button onclick="closeComments()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+        </div>
+        
+        <!-- Comments List -->
+        <div id="commentsList" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll">
+            <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Add Comment Input -->
+        <div class="p-4 bg-dh-dark border-t border-gray-800">
+            <form onsubmit="postComment(event)" class="flex gap-2">
+                <input type="hidden" id="activePostId">
+                <input type="text" id="commentInput" placeholder="Join the debate..." class="flex-1 bg-dh-card border border-gray-700 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-dh-purple" autocomplete="off">
+                <button type="submit" class="bg-dh-purple text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-dh-neon transition-colors"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // --- Modal Logic ---
-        function toggleModal(modalID) {
-            const modal = document.getElementById(modalID);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
+        // --- 1. STATE MANAGEMENT ---
+        let currentUser = null; 
+        
+        // Dummy Database of Battles
+        let battles = [
+            {
+                id: 1,
+                author: "SithLord99",
+                charA: "Darth Vader",
+                charB: "Voldemort",
+                context: "Standard gear. Location: Neutral wasteland. Both bloodlusted.",
+                votesA: 7240,
+                votesB: 2815,
+                likes: 12400,
+                likedByMe: false,
+                favByMe: false,
+                colorA: "from-blue-900 to-black",
+                colorB: "from-emerald-900 to-black",
+                comments: [
+                    { user: "JediMaster", text: "Vader Force chokes instantly. Next." },
+                    { user: "PotterHead", text: "Apparition + Avada Kedavra. Voldy wins." }
+                ],
+                votedFor: null // 'A' or 'B'
+            },
+            {
+                id: 2,
+                author: "WeebKing",
+                charA: "Goku",
+                charB: "Superman",
+                context: "Tournament of Power rules. No killing.",
+                votesA: 45012,
+                votesB: 44980,
+                likes: 38200,
+                likedByMe: true,
+                favByMe: true,
+                colorA: "from-orange-700 to-black",
+                colorB: "from-blue-700 to-black",
+                comments: [
+                    { user: "ComicNerd", text: "Superman Prime One Million blinks the verse." }
+                ],
+                votedFor: null
+            },
+            {
+                id: 3,
+                author: "MarvelFan",
+                charA: "Wolverine",
+                charB: "Deadpool",
+                context: "Fight to incapacitation.",
+                votesA: 8900,
+                votesB: 9200,
+                likes: 4100,
+                likedByMe: false,
+                favByMe: false,
+                colorA: "from-yellow-700 to-black",
+                colorB: "from-red-900 to-black",
+                comments: [],
+                votedFor: null
             }
-        }
+        ];
 
-        // --- Voting Logic ---
-        let votesA = 7240;
-        let votesB = 2815;
-        let hasVoted = false;
+        // --- 2. INITIALIZATION & RENDERING ---
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNav();
+            renderFeed();
+        });
 
-        function castVote(choice) {
-            if (hasVoted) {
-                alert("You have already voted in this match!");
+        function renderFeed(filterText = "") {
+            const feedContainer = document.getElementById('feedContainer');
+            feedContainer.innerHTML = '';
+
+            // Sort by popularity (likes + votes)
+            let displayBattles = [...battles].sort((a, b) => (b.likes + b.votesA + b.votesB) - (a.likes + a.votesA + a.votesB));
+
+            // Apply Search Filter
+            if (filterText) {
+                const q = filterText.toLowerCase();
+                displayBattles = displayBattles.filter(b => 
+                    b.charA.toLowerCase().includes(q) || 
+                    b.charB.toLowerCase().includes(q)
+                );
+            }
+
+            if (displayBattles.length === 0) {
+                feedContainer.innerHTML = `<div class="h-full flex items-center justify-center text-gray-500">No battles found. Be the first to create one!</div>`;
                 return;
             }
-            
-            if (choice === 'A') votesA++;
-            if (choice === 'B') votesB++;
-            
-            hasVoted = true;
-            updateVoteUI();
-        }
 
-        function updateVoteUI() {
-            const total = votesA + votesB;
-            const pctA = Math.round((votesA / total) * 100);
-            const pctB = 100 - pctA;
+            // Build HTML for each battle
+            displayBattles.forEach(battle => {
+                const totalVotes = battle.votesA + battle.votesB;
+                const pctA = totalVotes === 0 ? 50 : Math.round((battle.votesA / totalVotes) * 100);
+                const pctB = 100 - pctA;
 
-            // Animate Bars
-            document.getElementById('barA').style.width = pctA + '%';
-            document.getElementById('barB').style.width = pctB + '%';
+                const heartClass = battle.likedByMe ? "text-red-500" : "text-white";
+                const favClass = battle.favByMe ? "text-yellow-400" : "text-white";
+                
+                const btnAClass = battle.votedFor === 'A' ? "bg-dh-purple border-dh-purple text-white shadow-neon" : "bg-black/40 border-gray-600 hover:border-dh-purple text-gray-300";
+                const btnBClass = battle.votedFor === 'B' ? "bg-dh-purple border-dh-purple text-white shadow-neon" : "bg-black/40 border-gray-600 hover:border-dh-purple text-gray-300";
 
-            // Update Text
-            document.getElementById('votesA_text').innerText = `${votesA.toLocaleString()} Votes (${pctA}%)`;
-            document.getElementById('votesB_text').innerText = `${votesB.toLocaleString()} Votes (${pctB}%)`;
-        }
+                const html = `
+                <article class="snap-start relative h-full min-h-[70vh] w-full rounded-2xl overflow-hidden flex flex-col bg-dh-card border border-gray-800 shadow-lg group">
+                    
+                    <!-- Header Data -->
+                    <div class="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-700">
+                        <img src="https://ui-avatars.com/api/?name=${battle.author}&background=random" class="w-6 h-6 rounded-full">
+                        <span class="text-xs font-bold text-white">${battle.author}</span>
+                    </div>
 
-        // --- Comment Logic ---
-        function postComment() {
-            const box = document.getElementById('commentBox');
-            const text = box.value.trim();
-            if(!text) return;
-
-            const list = document.getElementById('commentsList');
-            const newComment = `
-                <div class="flex gap-4 animate-[fadeIn_0.5s_ease-out]">
-                    <img src="https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff" class="w-10 h-10 rounded-full mt-1">
-                    <div class="w-full">
-                        <div class="bg-dh-dark p-4 rounded-xl rounded-tl-none border border-dh-purple/50 shadow-[0_0_10px_rgba(139,92,246,0.1)]">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-dh-neon text-sm">You</span>
-                                <span class="text-xs text-dh-muted">Just now</span>
-                            </div>
-                            <p class="text-sm text-gray-300">${text}</p>
+                    <!-- Visual Split View -->
+                    <div class="flex-1 flex w-full relative">
+                        <div class="w-1/2 bg-gradient-to-br ${battle.colorA} flex flex-col items-center justify-center p-4 border-r border-dh-purple/30">
+                            <h2 class="text-3xl md:text-5xl font-black italic text-white text-center drop-shadow-xl text-stroke">${battle.charA}</h2>
+                            <div class="text-xl font-bold text-white mt-4">${pctA}%</div>
                         </div>
-                        <div class="flex gap-4 mt-2 ml-2 text-xs text-dh-muted font-semibold">
-                            <button class="hover:text-dh-neon transition"><i class="fa-solid fa-arrow-up"></i> 0</button>
-                            <button class="hover:text-red-500 transition"><i class="fa-solid fa-arrow-down"></i> 0</button>
-                            <button class="hover:text-white transition">Reply</button>
+                        
+                        <!-- VS Badge -->
+                        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                            <div class="bg-dh-dark border-2 border-dh-purple w-12 h-12 md:w-16 md:w-16 rounded-full flex items-center justify-center shadow-neon">
+                                <span class="text-lg md:text-xl font-black text-white italic">VS</span>
+                            </div>
+                        </div>
+
+                        <div class="w-1/2 bg-gradient-to-bl ${battle.colorB} flex flex-col items-center justify-center p-4">
+                            <h2 class="text-3xl md:text-5xl font-black italic text-white text-center drop-shadow-xl text-stroke">${battle.charB}</h2>
+                            <div class="text-xl font-bold text-white mt-4">${pctB}%</div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Bottom Bar -->
+                    <div class="h-auto bg-dh-dark p-4 md:p-6 border-t border-gray-800">
+                        <p class="text-center text-xs text-dh-muted mb-4">${battle.context || 'Standard Rules Apply'}</p>
+                        
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-gray-800 rounded-full h-2 mb-4 flex overflow-hidden">
+                            <div class="bg-blue-500 h-2 transition-all duration-500" style="width: ${pctA}%"></div>
+                            <div class="bg-red-500 h-2 transition-all duration-500" style="width: ${pctB}%"></div>
+                        </div>
+
+                        <!-- Vote Buttons -->
+                        <div class="flex gap-4 max-w-2xl mx-auto pr-16 md:pr-0">
+                            <button onclick="castVote(${battle.id}, 'A')" class="flex-1 border py-2 md:py-3 rounded-xl font-bold transition-all ${btnAClass}">
+                                Vote ${battle.charA.split(' ')[0]}
+                            </button>
+                            <button onclick="castVote(${battle.id}, 'B')" class="flex-1 border py-2 md:py-3 rounded-xl font-bold transition-all ${btnBClass}">
+                                Vote ${battle.charB.split(' ')[0]}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TikTok Style Action Bar (Floating Right) -->
+                    <div class="absolute right-2 md:right-4 bottom-32 md:bottom-24 flex flex-col items-center space-y-6 z-30">
+                        <button onclick="toggleLike(${battle.id})" class="flex flex-col items-center group">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-black/60 backdrop-blur rounded-full flex items-center justify-center border border-gray-700 group-hover:border-dh-purple transition-all">
+                                <i class="fa-solid fa-heart text-xl ${heartClass}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold text-white mt-1">${formatNumber(battle.likes)}</span>
+                        </button>
+                        <button onclick="openComments(${battle.id})" class="flex flex-col items-center group">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-black/60 backdrop-blur rounded-full flex items-center justify-center border border-gray-700 group-hover:border-dh-purple transition-all">
+                                <i class="fa-solid fa-comment text-xl text-white"></i>
+                            </div>
+                            <span class="text-[10px] font-bold text-white mt-1">${battle.comments.length}</span>
+                        </button>
+                        <button onclick="toggleFav(${battle.id})" class="flex flex-col items-center group">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-black/60 backdrop-blur rounded-full flex items-center justify-center border border-gray-700 group-hover:border-dh-purple transition-all">
+                                <i class="fa-solid fa-bookmark text-xl ${favClass}"></i>
+                            </div>
+                        </button>
+                    </div>
+
+                </article>
+                `;
+                feedContainer.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        // --- 3. CORE LOGIC (VOTING, LIKES, SEARCH) ---
+        function castVote(id, choice) {
+            if (!currentUser) return toggleModal('authModal');
+            
+            const battle = battles.find(b => b.id === id);
+            if (battle.votedFor) {
+                alert("You have already voted on this matchup!");
+                return;
+            }
+
+            battle.votedFor = choice;
+            if (choice === 'A') battle.votesA++;
+            if (choice === 'B') battle.votesB++;
+            
+            // Re-render feed keeping current scroll position
+            const container = document.getElementById('feedContainer');
+            const scrollPos = container.scrollTop;
+            renderFeed(document.getElementById('searchInput').value);
+            container.scrollTop = scrollPos;
+        }
+
+        function toggleLike(id) {
+            if (!currentUser) return toggleModal('authModal');
+            const battle = battles.find(b => b.id === id);
+            battle.likedByMe = !battle.likedByMe;
+            battle.likedByMe ? battle.likes++ : battle.likes--;
+            
+            const container = document.getElementById('feedContainer');
+            const scrollPos = container.scrollTop;
+            renderFeed(document.getElementById('searchInput').value);
+            container.scrollTop = scrollPos;
+        }
+
+        function toggleFav(id) {
+            if (!currentUser) return toggleModal('authModal');
+            const battle = battles.find(b => b.id === id);
+            battle.favByMe = !battle.favByMe;
+            
+            const container = document.getElementById('feedContainer');
+            const scrollPos = container.scrollTop;
+            renderFeed(document.getElementById('searchInput').value);
+            container.scrollTop = scrollPos;
+        }
+
+        function handleSearch(val) {
+            renderFeed(val);
+        }
+
+        // --- 4. COMMENTS SYSTEM ---
+        function openComments(id) {
+            document.getElementById('activePostId').value = id;
+            const panel = document.getElementById('commentsPanel');
+            panel.classList.remove('translate-x-full');
+            renderCommentsList(id);
+        }
+
+        function closeComments() {
+            document.getElementById('commentsPanel').classList.add('translate-x-full');
+        }
+
+        function renderCommentsList(id) {
+            const battle = battles.find(b => b.id === id);
+            const list = document.getElementById('commentsList');
+            
+            if (battle.comments.length === 0) {
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm mt-4">No arguments yet. Be the first!</p>`;
+                return;
+            }
+
+            list.innerHTML = battle.comments.map(c => `
+                <div class="flex gap-3 text-sm">
+                    <img src="https://ui-avatars.com/api/?name=${c.user}&background=random" class="w-8 h-8 rounded-full">
+                    <div>
+                        <div class="bg-dh-dark p-3 rounded-xl rounded-tl-none border border-gray-700">
+                            <span class="font-bold text-dh-purple block text-xs mb-1">${c.user}</span>
+                            <span class="text-gray-200">${c.text}</span>
                         </div>
                     </div>
                 </div>
-            `;
+            `).join('');
             
-            list.insertAdjacentHTML('afterbegin', newComment);
-            box.value = '';
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function postComment(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                closeComments();
+                return toggleModal('authModal');
+            }
+            
+            const id = parseInt(document.getElementById('activePostId').value);
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            const battle = battles.find(b => b.id === id);
+            battle.comments.push({ user: currentUser, text: text });
+            
+            input.value = '';
+            renderCommentsList(id);
+
+            // Re-render feed silently to update comment count badge
+            const container = document.getElementById('feedContainer');
+            const scrollPos = container.scrollTop;
+            renderFeed(document.getElementById('searchInput').value);
+            container.scrollTop = scrollPos;
+        }
+
+        // --- 5. AUTH & USER FLOW ---
+        function toggleModal(modalID) {
+            const modal = document.getElementById(modalID);
+            modal.classList.toggle('hidden');
+        }
+
+        function switchAuthTab(mode) {
+            document.getElementById('authMode').value = mode;
+            const loginTab = document.getElementById('tabLogin');
+            const signupTab = document.getElementById('tabSignup');
+            const userField = document.getElementById('usernameField');
+            const btn = document.getElementById('authSubmitBtn');
+
+            if (mode === 'login') {
+                loginTab.className = "flex-1 pb-3 font-bold text-dh-neon border-b-2 border-dh-neon transition-colors";
+                signupTab.className = "flex-1 pb-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors";
+                userField.classList.add('hidden');
+                btn.innerText = "Log In";
+            } else {
+                signupTab.className = "flex-1 pb-3 font-bold text-dh-neon border-b-2 border-dh-neon transition-colors";
+                loginTab.className = "flex-1 pb-3 font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-300 transition-colors";
+                userField.classList.remove('hidden');
+                btn.innerText = "Sign Up";
+            }
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const mode = document.getElementById('authMode').value;
+            
+            if (mode === 'signup') {
+                const user = document.getElementById('regUsername').value;
+                if(!user) return alert("Enter a username");
+                currentUser = user;
+            } else {
+                // Fake Login
+                const email = document.getElementById('authEmail').value;
+                currentUser = email.split('@')[0]; // dummy username
+            }
+
+            toggleModal('authModal');
+            updateNav();
+        }
+
+        function logout() {
+            currentUser = null;
+            updateNav();
+        }
+
+        function updateNav() {
+            const nav = document.getElementById('navActions');
+            if (currentUser) {
+                nav.innerHTML = `
+                    <button onclick="toggleModal('createModal')" class="bg-dh-purple hover:bg-dh-purpleHover text-white px-4 py-1.5 rounded-full font-bold text-sm shadow-neon transition-all mr-2">
+                        + Create
+                    </button>
+                    <div class="flex items-center gap-2 group relative cursor-pointer" onclick="logout()">
+                        <img src="https://ui-avatars.com/api/?name=${currentUser}&background=8b5cf6&color=fff" class="w-8 h-8 rounded-full border border-dh-purple">
+                        <span class="text-sm font-bold text-white hidden md:block hover:text-red-400" title="Click to logout">${currentUser}</span>
+                    </div>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <button onclick="toggleModal('authModal')" class="bg-transparent border border-dh-purple text-dh-neon hover:bg-dh-purple hover:text-white px-5 py-1.5 rounded-full font-semibold transition-all shadow-[0_0_10px_rgba(139,92,246,0.2)] hover:shadow-neon text-sm">
+                        Log In
+                    </button>
+                `;
+            }
+        }
+
+        // --- 6. CREATE BATTLE FLOW ---
+        function handleCreateBattle(e) {
+            e.preventDefault();
+            const f1 = document.getElementById('fighter1').value;
+            const f2 = document.getElementById('fighter2').value;
+            const ctx = document.getElementById('battleContext').value;
+
+            const newId = battles.length ? Math.max(...battles.map(b => b.id)) + 1 : 1;
+            
+            const newBattle = {
+                id: newId,
+                author: currentUser,
+                charA: f1,
+                charB: f2,
+                context: ctx,
+                votesA: 0, votesB: 0, likes: 0,
+                likedByMe: false, favByMe: false,
+                colorA: "from-purple-900 to-black", // Default generic colors
+                colorB: "from-gray-800 to-black",
+                comments: [],
+                votedFor: null
+            };
+
+            battles.push(newBattle);
+            
+            toggleModal('createModal');
+            e.target.reset();
+            
+            // Clear search and jump to top of feed to see new post
+            document.getElementById('searchInput').value = '';
+            renderFeed();
+            document.getElementById('feedContainer').scrollTop = 0;
+        }
+
+        // Utils
+        function formatNumber(num) {
+            return num >= 1000 ? (num/1000).toFixed(1) + 'k' : num;
         }
     </script>
 </body>
